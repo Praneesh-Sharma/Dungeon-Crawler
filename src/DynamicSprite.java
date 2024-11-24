@@ -74,5 +74,41 @@ public class DynamicSprite extends SolidSprite{
         g.drawImage(image,(int) x, (int) y, (int) (x+width),(int) (y+height),
                 (int) (index*this.width), (int) (direction.getFrameLineNumber()*height),
                 (int) ((index+1)*this.width), (int)((direction.getFrameLineNumber()+1)*this.height),null);
+
+        // Draw the hero's hitbox as a black rectangle for debugging
+//        Rectangle2D hitBox = getHitBox(); // Get the hitbox of the hero
+//        g.setColor(Color.BLACK); // Set color to black for the hitbox
+//        g.drawRect((int) hitBox.getX(), (int) hitBox.getY(), (int) hitBox.getWidth(), (int) hitBox.getHeight());  // Draw the hitbox
+
     }
+
+    public double getSpeed() {
+        return this.speed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    @Override
+    public Rectangle2D getHitBox() {
+        // Get the original hitbox from the superclass (SolidSprite)
+        Rectangle2D originalHitBox = super.getHitBox();
+
+        // Shrink the width and height independently as needed
+        double widthShrinkFactor = 0.8; // Example: Shrink width to 80% of original
+        double heightShrinkFactor = 0.67; // Example: Shrink height to 67% of original
+
+        // Apply the shrink factor
+        double newWidth = originalHitBox.getWidth() * widthShrinkFactor;
+        double newHeight = originalHitBox.getHeight() * heightShrinkFactor;
+
+        // Keep the top edge fixed for height, but adjust the y-coordinate for height shrinkage
+        double newY = originalHitBox.getY() + (originalHitBox.getHeight() - newHeight); // Shrink from the top
+
+        // Return the modified hitbox with new width and height
+        return new Rectangle2D.Double(originalHitBox.getX(), newY, newWidth, newHeight);
+    }
+
+
 }

@@ -2,53 +2,143 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Main {
 
-    JFrame displayZoneFrame;
-
+    JFrame displayZoneFrame; //graphical window to display elements
     RenderEngine renderEngine;
     GameEngine gameEngine;
     PhysicEngine physicEngine;
 
-    public Main() throws Exception{
-        displayZoneFrame = new JFrame("Java Labs");
-        displayZoneFrame.setSize(400,600);
-        displayZoneFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    //Declare timers as instance variables
+    Timer renderTimer, gameTimer, physicTimer;
 
-        DynamicSprite hero = new DynamicSprite(200,300,
-                ImageIO.read(new File("./img/heroTileSheetLowRes.png")),48,50);
+    private boolean isPaused = false; //Flag to track if the game is paused
 
-        renderEngine = new RenderEngine(displayZoneFrame);
-        physicEngine = new PhysicEngine();
-        gameEngine = new GameEngine(hero);
+    public Main() throws Exception {
+        displayZoneFrame = new JFrame("Java Labs"); //makes a blank canvas (frame/window)
+        displayZoneFrame.setSize(770, 670); //dimensions of the window (sets size in pixels)
+        displayZoneFrame.setDefaultCloseOperation(EXIT_ON_CLOSE); //end of program on press of close button
 
-        Timer renderTimer = new Timer(50,(time)-> renderEngine.update());
-        Timer gameTimer = new Timer(50,(time)-> gameEngine.update());
-        Timer physicTimer = new Timer(50,(time)-> physicEngine.update());
+        showStartScreen();
+    }
 
+    private void showStartScreen(){
+        displayZoneFrame.getContentPane().removeAll();
+        displayZoneFrame.getContentPane().add(new StartScreen(displayZoneFrame, this::startGame));
+        displayZoneFrame.revalidate();
+        displayZoneFrame.repaint();
+        displayZoneFrame.setVisible(true);
+
+        // Ensure the JFrame has focus
+        displayZoneFrame.setFocusable(true);
+        displayZoneFrame.requestFocusInWindow();
+    }
+
+    public void startGame(){
+        try {
+            //Stop previous timers before starting new ones
+            stopTimers();
+
+            //Reset previous game states and initialize game components
+            DynamicSprite hero = new DynamicSprite(190, 300,
+                    ImageIO.read(new File("./img/heroTileSheetLowRes.png")), 48, 50);
+
+            renderEngine = new RenderEngine(displayZoneFrame);
+            physicEngine = new PhysicEngine();
+            gameEngine = new GameEngine(hero);
+
+            //Add the Esc key listener to the game engine
+            gameEngine.addEscListener(()->{
+                // Stop the game and show the pause screen
+                // System.out.println("Esc key pressed. Pausing the game..."); //debug statement
+                pauseGame();
+            });
+
+            // Create timers for game update, render, and physics
+            renderTimer = new Timer(50, (time) -> renderEngine.update());
+            gameTimer = new Timer(50, (time) -> gameEngine.update());
+            physicTimer = new Timer(50, (time) -> physicEngine.update());
+
+            renderTimer.start();
+            gameTimer.start();
+            physicTimer.start();
+
+            displayZoneFrame.getContentPane().add(renderEngine);
+            displayZoneFrame.setVisible(true);  // triggers the display
+
+            Playground level = new Playground("./data/level1.txt");
+            renderEngine.addToRenderList(level.getSpriteList());
+            renderEngine.addToRenderList(hero);
+            physicEngine.addToMovingSpriteList(hero);
+            physicEngine.setEnvironment(level.getSolidSpriteList());
+
+            // Add the key listener for the game
+            displayZoneFrame.addKeyListener(gameEngine);
+            displayZoneFrame.setFocusable(true);  // Ensure the window can receive input
+            displayZoneFrame.requestFocusInWindow(); // Request focus explicitly
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void pauseGame(){
+        //Stop all the timers when the game is paused
+        stopTimers();
+
+        //Display the pause screen
+        displayZoneFrame.getContentPane().removeAll();
+        displayZoneFrame.getContentPane().add(new PauseScreen(this::resumeGame, this::goHome));
+        displayZoneFrame.revalidate();
+        displayZoneFrame.repaint();
+
+        // Remove the game engine's key listener while paused
+        displayZoneFrame.removeKeyListener(gameEngine);
+    }
+
+    private void resumeGame(){
+        //Restart timers when the game is resumed
         renderTimer.start();
         gameTimer.start();
         physicTimer.start();
 
+        //Remove the pause screen
+        displayZoneFrame.getContentPane().removeAll();
         displayZoneFrame.getContentPane().add(renderEngine);
-        displayZoneFrame.setVisible(true);
+        displayZoneFrame.revalidate();
+        displayZoneFrame.repaint();
 
-        Playground level = new Playground("./data/level1.txt");
-        //SolidSprite testSprite = new DynamicSprite(100,100,test,0,0);
-        renderEngine.addToRenderList(level.getSpriteList());
-        renderEngine.addToRenderList(hero);
-        physicEngine.addToMovingSpriteList(hero);
-        physicEngine.setEnvironment(level.getSolidSpriteList());
-
+        // Add the game engine's key listener again
         displayZoneFrame.addKeyListener(gameEngine);
+        displayZoneFrame.setFocusable(true);  // Ensure the window can receive input
+        displayZoneFrame.requestFocusInWindow(); // Request focus explicitly
+
+        // Set the paused flag
+        isPaused = false;
+    }
+
+    private void goHome() {
+        // Go back to the start screen
+        showStartScreen();
+
+        // Remove key listener when returning to the start screen
+        displayZoneFrame.removeKeyListener(gameEngine);
+        isPaused = false;
+    }
+
+    private void stopTimers() {
+        // Stop the timers if they exist
+        if (renderTimer != null) renderTimer.stop();
+        if (gameTimer != null) gameTimer.stop();
+        if (physicTimer != null) physicTimer.stop();
     }
 
     public static void main (String[] args) throws Exception {
-	// write your code here
+        // Initialize the main game
         Main main = new Main();
     }
 }
+
+
