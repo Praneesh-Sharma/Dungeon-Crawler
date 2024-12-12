@@ -6,6 +6,7 @@ public class GameEngine implements Engine, KeyListener {
     Runnable escCallback;
     private boolean ctrlPressed = false; //Track if CTRL is pressed
     private boolean speedDoubled = false; // Flag to prevent multiple changes to speed
+    private boolean showFPS = false; // Flag to toggle FPS visibility
 
     public GameEngine(DynamicSprite hero) {
         this.hero = hero;
@@ -30,7 +31,6 @@ public class GameEngine implements Engine, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
@@ -49,8 +49,8 @@ public class GameEngine implements Engine, KeyListener {
                 hero.setDirection(Direction.EAST);
                 break;
             case KeyEvent.VK_ESCAPE:
-                //Call the callback is Esc is pressed
-                if(escCallback != null){
+                // Call the callback if Esc is pressed
+                if (escCallback != null) {
                     escCallback.run();
                 }
                 break;
@@ -58,14 +58,29 @@ public class GameEngine implements Engine, KeyListener {
                 // Ctrl is being held down, double speed
                 ctrlPressed = true;
                 break;
+            case KeyEvent.VK_F:
+                // Toggle FPS display when 'F' is pressed
+                showFPS = !showFPS;
+                // Call the method to toggle FPS visibility in the GamePanel (or wherever FPS is drawn)
+                if (showFPS) {
+                    System.out.println("FPS Display Enabled"); // You can add a specific method call to update the display in the rendering class
+                } else {
+                    System.out.println("FPS Display Disabled");
+                }
+                break;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if(e.getKeyCode() == KeyEvent.VK_CONTROL){
-            // Reset speed when CTRL is pressed
+        if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            // Reset speed when CTRL is released
             ctrlPressed = false;
         }
+    }
+
+    // Getter method for showFPS
+    public boolean isShowFPS() {
+        return showFPS;
     }
 }
