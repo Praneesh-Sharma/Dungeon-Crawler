@@ -66,21 +66,19 @@ public class Main {
             gameTimer = new Timer(50, (time) -> {
                 gameEngine.update();
 
-                // Increment the frame counter
+                // Increment frame counter
                 frames[0].getAndIncrement();
 
                 // Calculate FPS every second
                 long now = System.nanoTime();
-                if (now - lastTime[0] >= 1000000000L) {  // Check if 1 second has passed (1 billion nanoseconds)
-                    fps[0] = frames[0].get();  // Set FPS to the number of frames in the last second
+                if (now - lastTime[0] >= 1000000000L) {  // 1 second has passed
+                    fps[0] = frames[0].get();  // Set FPS to frame count in the last second
                     frames[0].set(0);  // Reset frame counter
                     lastTime[0] = now;  // Update lastTime to current time
 
-                    // Pass the FPS value to the RenderEngine
-                    renderEngine.setFps(fps[0]);
-
-                    // Print FPS in terminal
-                    // System.out.println("FPS: " + fps[0]);
+                    // Set FPS value in the RenderEngine
+                    renderEngine.setFps(fps[0]);  // Update the FPS display
+                    renderEngine.setShowFPS(gameEngine.isShowFPS());  // Pass the showFPS flag
                 }
             });
 
@@ -179,21 +177,19 @@ public class Main {
             gameTimer = new Timer(50, (time) -> {
                 gameEngine.update();
 
-                // Increment the frame counter
+                // Increment frame counter
                 frames[0].getAndIncrement();
 
                 // Calculate FPS every second
                 long now = System.nanoTime();
-                if (now - lastTime[0] >= 1000000000L) {  // Check if 1 second has passed (1 billion nanoseconds)
-                    fps[0] = frames[0].get();  // Set FPS to the number of frames in the last second
+                if (now - lastTime[0] >= 1000000000L) {  // 1 second has passed
+                    fps[0] = frames[0].get();  // Set FPS to frame count in the last second
                     frames[0].set(0);  // Reset frame counter
                     lastTime[0] = now;  // Update lastTime to current time
 
-                    // Pass the FPS value to the RenderEngine
-                    renderEngine.setFps(fps[0]);
-
-                    // Print FPS in terminal
-                    // System.out.println("FPS: " + fps[0]);
+                    // Set FPS value in the RenderEngine
+                    renderEngine.setFps(fps[0]);  // Update the FPS display
+                    renderEngine.setShowFPS(gameEngine.isShowFPS());  // Pass the showFPS flag
                 }
             });
             physicTimer = new Timer(50, (time) -> physicEngine.update());

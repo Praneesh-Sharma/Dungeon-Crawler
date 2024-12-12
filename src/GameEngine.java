@@ -35,8 +35,8 @@ public class GameEngine implements Engine, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        switch(e.getKeyCode()){
-            case KeyEvent.VK_UP :
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP:
                 hero.setDirection(Direction.NORTH);
                 break;
             case KeyEvent.VK_DOWN:
@@ -49,24 +49,21 @@ public class GameEngine implements Engine, KeyListener {
                 hero.setDirection(Direction.EAST);
                 break;
             case KeyEvent.VK_ESCAPE:
-                // Call the callback if Esc is pressed
                 if (escCallback != null) {
                     escCallback.run();
                 }
                 break;
             case KeyEvent.VK_CONTROL:
-                // Ctrl is being held down, double speed
                 ctrlPressed = true;
                 break;
             case KeyEvent.VK_F:
-                // Toggle FPS display when 'F' is pressed
+                // Toggle FPS display
                 showFPS = !showFPS;
-                // Call the method to toggle FPS visibility in the GamePanel (or wherever FPS is drawn)
-                if (showFPS) {
-                    System.out.println("FPS Display Enabled"); // You can add a specific method call to update the display in the rendering class
-                } else {
-                    System.out.println("FPS Display Disabled");
-                }
+//                if (showFPS) {
+//                    System.out.println("FPS Display Enabled");
+//                } else {
+//                    System.out.println("FPS Display Disabled");
+//                }
                 break;
         }
     }
