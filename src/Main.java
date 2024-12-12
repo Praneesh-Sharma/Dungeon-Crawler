@@ -75,7 +75,12 @@ public class Main {
                     fps[0] = frames[0].get();  // Set FPS to the number of frames in the last second
                     frames[0].set(0);  // Reset frame counter
                     lastTime[0] = now;  // Update lastTime to current time
-                    System.out.println("FPS: " + fps[0]);  // Print FPS in terminal
+
+                    // Pass the FPS value to the RenderEngine
+                    renderEngine.setFps(fps[0]);
+
+                    // Print FPS in terminal
+                    // System.out.println("FPS: " + fps[0]);
                 }
             });
 
@@ -102,7 +107,6 @@ public class Main {
             e.printStackTrace();
         }
     }
-
 
     private void pauseGame() {
         stopTimers();
@@ -151,6 +155,14 @@ public class Main {
             // Clear the frame to remove existing content
             displayZoneFrame.getContentPane().removeAll();
 
+            // Reset FPS variables
+            final long[] lastTime = {System.nanoTime()};  // Store the time of the last update
+            final AtomicInteger[] frames = {new AtomicInteger()};  // Counter for frames
+            final int[] fps = {0};  // Frames per second value
+
+            // Reset the render engine's FPS display
+            renderEngine.setFps(fps[0]);  // Set the initial FPS value in the render engine
+
             // Reset game components
             DynamicSprite hero = new DynamicSprite(190, 300,
                     ImageIO.read(new File("./img/heroTileSheetLowRes.png")), 48, 50);
@@ -160,11 +172,30 @@ public class Main {
             gameEngine = new GameEngine(hero);
 
             // Add the Escape key listener again for pausing
-            gameEngine.addEscListener(() -> pauseGame());
+            gameEngine.addEscListener(this::pauseGame);
 
-            // Initialize timers
+            // Create timers for rendering, game updates, and physics
             renderTimer = new Timer(50, (time) -> renderEngine.update());
-            gameTimer = new Timer(50, (time) -> gameEngine.update());
+            gameTimer = new Timer(50, (time) -> {
+                gameEngine.update();
+
+                // Increment the frame counter
+                frames[0].getAndIncrement();
+
+                // Calculate FPS every second
+                long now = System.nanoTime();
+                if (now - lastTime[0] >= 1000000000L) {  // Check if 1 second has passed (1 billion nanoseconds)
+                    fps[0] = frames[0].get();  // Set FPS to the number of frames in the last second
+                    frames[0].set(0);  // Reset frame counter
+                    lastTime[0] = now;  // Update lastTime to current time
+
+                    // Pass the FPS value to the RenderEngine
+                    renderEngine.setFps(fps[0]);
+
+                    // Print FPS in terminal
+                    // System.out.println("FPS: " + fps[0]);
+                }
+            });
             physicTimer = new Timer(50, (time) -> physicEngine.update());
 
             // Start timers for new game
@@ -193,6 +224,7 @@ public class Main {
             e.printStackTrace();
         }
     }
+
 
 
     private void goHome() {
