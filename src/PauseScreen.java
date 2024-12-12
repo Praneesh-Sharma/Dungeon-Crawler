@@ -1,24 +1,43 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.io.File;
 
 public class PauseScreen extends JPanel {
+    private Image backgroundImage;
+    private Image logoImage;
+
     public PauseScreen(JFrame frame, Runnable resumeGameCallback, Runnable restartGameCallback, Runnable goHomeCallback) {
+        // Load the background and logo images
+        try {
+            backgroundImage = ImageIO.read(new File("./img/backgroundPause.jpg")); // Background image
+            logoImage = ImageIO.read(new File("./img/logo.png")); // Logo image
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         setLayout(new BorderLayout());
-        setBackground(new Color(0, 0, 0, 10)); // Semi-transparent black background for dim effect
 
-        // Manually set logo size
-        ImageIcon logoIcon = new ImageIcon("./img/logo.png");
-        Image logoImage = logoIcon.getImage().getScaledInstance(400, 400, Image.SCALE_SMOOTH); // Manually set size to 300x150
-        JLabel logoLabel = new JLabel(new ImageIcon(logoImage));
-        logoLabel.setAlignmentX(CENTER_ALIGNMENT);
+        // Main Panel for Centering Content
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS)); // Vertical alignment
+        mainPanel.setOpaque(false); // Make the panel transparent
 
-        // Buttons panel
+        // Logo Label
+        if (logoImage != null) {
+            logoImage = logoImage.getScaledInstance(400, 400, Image.SCALE_SMOOTH); // Resize logo
+        }
+        JLabel logoLabel = new JLabel(new ImageIcon(logoImage)); // Add resized logo
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center logo horizontally
+        mainPanel.add(logoLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space below logo
+
+        // Buttons Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Vertical stacking
-        buttonPanel.setOpaque(false); // Transparent panel
+        buttonPanel.setOpaque(false); // Make the panel transparent
 
         // Resume Button
         JButton resumeButton = new JButton("Resume");
@@ -58,8 +77,26 @@ public class PauseScreen extends JPanel {
         homeButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center button horizontally
         buttonPanel.add(homeButton);
 
-        // Add components to the main panel
-        add(logoLabel, BorderLayout.NORTH); // Logo at the top
-        add(buttonPanel, BorderLayout.CENTER); // Buttons in the center
+        // Add Buttons Panel to Main Panel
+        mainPanel.add(buttonPanel);
+
+        // Add Main Panel to Center
+        add(mainPanel, BorderLayout.CENTER);
+
+        // Credits/Instructions Label
+        JLabel credits = new JLabel("Created by Praneesh Sharma", SwingConstants.CENTER);
+        credits.setFont(new Font("Arial", Font.ITALIC, 14));
+        credits.setForeground(Color.WHITE);
+        add(credits, BorderLayout.SOUTH);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Draw the background image
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }

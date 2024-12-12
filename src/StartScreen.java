@@ -13,7 +13,7 @@ public class StartScreen extends JPanel {
     public StartScreen(JFrame frame, Runnable startGameCallback) {
         // Load the background and logo images
         try {
-            backgroundImage = ImageIO.read(new File("./img/background.jpg"));
+            backgroundImage = ImageIO.read(new File("./img/backgroundStart.jpg"));
             logoImage = ImageIO.read(new File("./img/logo.png"));
         } catch (IOException e) {
             e.printStackTrace();
