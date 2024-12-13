@@ -51,10 +51,8 @@ public class Main {
             gameEngine = new GameEngine(hero);
 
             // Add the Esc key listener to the game engine
-            gameEngine.addEscListener(() -> {
-                // Stop the game and show the pause screen
-                pauseGame();
-            });
+            // Stop the game and show the pause screen
+            gameEngine.addEscListener(this::pauseGame);
 
             // Declare FPS-related variables
             final long[] lastTime = {System.nanoTime()};  // Store the time of the last update
